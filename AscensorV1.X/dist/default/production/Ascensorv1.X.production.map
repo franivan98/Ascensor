@@ -1,0 +1,66 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Wed Jun 14 00:41:54 2023
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000002
+                   .cinit    romdata   0x000001    program   0x000004
+                   .org_1       code   0x000004    program   0x000002
+                   .org_2       code   0x000005    program   0x000124
+.config_2007_BUILD/DEFAULT/PRODUCTION/ASCENSO       code   0x002007    program   0x000002
+.config_2008_BUILD/DEFAULT/PRODUCTION/ASCENSO       code   0x002008    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000002      
+                            0x000004    0x000096      
+                            0x002007    0x002008      
+            152 out of 8455 program addresses used, program memory utilization is 1%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                 FIN_INTE   0x000092    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                   FIN_RB   0x000077    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                   INICIO   0x000005    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+               ISR_INICIO   0x00005a    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOP1   0x00004f    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOP2   0x000051    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOP3   0x000053    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOPI   0x000062    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+             MOSTRAR_DSPL   0x000027    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+            NINGUNA_TECLA   0x00008f    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                  RETARDO   0x00004d    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+        RUTINA_EMERGENCIA   0x000088    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+               TABLA_DSPL   0x00002b    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+            TABLA_TECLADO   0x00003c    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+             _.org_2_0026   0x000026    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   INICIO   0x000005    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+             _.org_2_0026   0x000026    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+             MOSTRAR_DSPL   0x000027    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+               TABLA_DSPL   0x00002b    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+            TABLA_TECLADO   0x00003c    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                  RETARDO   0x00004d    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOP1   0x00004f    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOP2   0x000051    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOP3   0x000053    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+               ISR_INICIO   0x00005a    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                    LOOPI   0x000062    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                   FIN_RB   0x000077    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+        RUTINA_EMERGENCIA   0x000088    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+            NINGUNA_TECLA   0x00008f    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+                 FIN_INTE   0x000092    program     static C:\Users\frank\MPLABXProjects\AscensorV1.X\ascensor.asm
+
+
