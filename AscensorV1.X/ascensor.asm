@@ -2,7 +2,7 @@
 ;* Descripcion del Hardware: 
 ;* Display de 7 segmentos de catodo comun conectado
 ;* al puerto D. Motor conectado a los pines RC0 y RC1. Buzzer de llegada al piso
-;* conectado al puerto RC2. Luz interna del ascensor al puerto RC3.
+;* conectado al puerto RC2. Luz interna del ascensor al puerto RC3
 ;* Teclado matricial 4x4 conectado al puerto b.
 ;*------------------------------------------------------------------------------
 ; Autor: Franco Mamani
