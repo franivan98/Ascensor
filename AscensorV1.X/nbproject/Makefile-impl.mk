@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Ascensorv1.X
+PROJECTNAME=AscensorV1.X
 
 # Active Configuration
 DEFAULTCONF=default
