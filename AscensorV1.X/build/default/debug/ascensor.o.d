@@ -1,3 +1,3 @@
 build/default/debug/ascensor.o:  \
-	C:/Users/frank/MPLABXProjects/AscensorV1.X/ascensor.asm  \
+	C:/Users/frank/MPLABXProjects/Ascensor/AscensorV1.X/ascensor.asm  \
 

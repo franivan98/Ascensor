@@ -1,4 +1,4 @@
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  1
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -8,7 +8,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00002 ;* Descripcion del Hardware: 
                       00003 ;* Display de 7 segmentos de catodo comun conectado
                       00004 ;* al puerto D. Motor conectado a los pines RC0 y RC1. Buzzer de llegada al piso
-                      00005 ;* conectado al puerto RC2. Luz interna del ascensor al puerto RC3.
+                      00005 ;* conectado al puerto RC2. Luz interna del ascensor al puerto RC3
                       00006 ;* Teclado matricial 4x4 conectado al puerto b.
                       00007 ;*------------------------------------------------------------------------------
                       00008 ; Autor: Franco Mamani
@@ -39,275 +39,313 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 2008   3FFF           00022             __CONFIG _CONFIG2, _BOR4V_BOR40V & _WRT_OFF
                       00023 
                       00024 ;****Definicion de Variables****
-                      00025         CBLOCK  0x70
-  00000070            00026         W_TEMP
-  00000071            00027         STATUS_TEMP
-  00000072            00028         PISO_ACTUAL     
-  00000073            00029         PISO_OBJETIVO
-  00000074            00030         FUNCIONANDO   ;Bandera para controlar si el Ascensor esta subiendo
-  00000075            00031         SETEO         ;Bandera para controlar si esta en modo seteo de piso
-  00000076            00032         SHIFTREG     ;registro auxiliar para controlar el teclado
-  00000077            00033         TECLA_PRESIONADA    
-  00000078            00034         DELAY1
-  00000079            00035         DELAY2
-  0000007A            00036         DELAY3
-  0000007B            00037         CONTADOR_TECLADO
-                      00038         
-                      00039         ENDC
-                      00040 ;****Inicio del Micro****
-                      00041         ORG 0x00
-0000   2???           00042         GOTO    INICIO
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  2
+Warning[207]: Found label after column 1. (SONANDO)
+  00000001            00025         SONANDO     EQU     1
+                      00026         CBLOCK  0x70
+  00000070            00027         W_TEMP
+  00000071            00028         STATUS_TEMP
+  00000072            00029         PISO_ACTUAL     
+  00000073            00030         PISO_OBJETIVO
+  00000074            00031         FUNCIONANDO   ;Bandera para controlar si el Ascensor esta subiendo
+  00000075            00032         SHIFTREG     ;registro auxiliar para controlar el teclado
+  00000076            00033         TECLA_PRESIONADA   
+  00000077            00034         PRESIONADO
+  00000078            00035         DELAY1
+  00000079            00036         DELAY2
+  0000007A            00037         DELAY3
+  0000007B            00038         CONTADOR_TECLADO
+  0000007C            00039         CONTADOR_TIMER
+                      00040         ENDC
+                      00041 ;****Inicio del Micro****
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00043         ORG 0x04
-0004   2???           00044         GOTO    ISR_INICIO
-                      00045         ORG 0x05
-                      00046 ;****Declaracion de Macros para configuracion de Registros****
-                      00047 CONFIG_SALIDAS  MACRO
-                      00048         ;Configuracion del display
-                      00049         BANKSEL TRISD
-                      00050         CLRF    TRISD
-                      00051         ;Configuracion puerto c. RC6 como salida por TX, y RC7 como entrada 
-                      00052         MOVLW   b'10000000'
-                      00053         MOVWF   TRISC
-                      00054         ENDM
-                      00055         
-                      00056 CONFIG_ENTRADAS  MACRO
-                      00057         BANKSEL ANSEL
-                      00058         CLRF    ANSELH
-                      00059         MOVLW   b'11110000' ;(RB0,RB3) Como salida, (RB4,RB7 como como entrada)
-                      00060         MOVWF   TRISB
-                      00061         ENDM
-                      00062         
-                      00063 CONFIG_GENERAL MACRO
-                      00064         BANKSEL WPUB
-                      00065         MOVLW   b'00001111' ;habilito pullups, configuro prescaler a 256, y lo asigno al TMR0
-                      00066         MOVWF   OPTION_REG
-                      00067         MOVLW   b'11110000'
-                      00068         MOVWF   WPUB
-                      00069         ENDM
-                      00070 CONFIG_INTERRUPCIONES MACRO
-                      00071         MOVLW   b'10001000'; habilito interrupciones globales, rb. AQUI HABILITAR INTERRPCIONES POR PUER
+                      00042         ORG 0x00
+0000   2???           00043         GOTO    INICIO
+                      00044         ORG 0x04
+0004   2???           00045         GOTO    ISR_INICIO
+                      00046         ORG 0x05
+                      00047 
+                      00048 
+0005                  00049 INICIO  
+                      00050         ;Configuracion de puertos de salida
+                      00051         ;Configuracion del display
+0005   1683 1303      00052         BANKSEL TRISD
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0007   0188           00053         CLRF    TRISD
+                      00054         ;Configuracion puerto c. RC6 como salida por TX, y RC7 como entrada 
+0008   3080           00055         MOVLW   b'10000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0009   0087           00056         MOVWF   TRISC
+                      00057         ;configuracion de entradas
+000A   1683 1703      00058         BANKSEL ANSEL
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000C   0189           00059         CLRF    ANSELH
+000D   30F0           00060         MOVLW   b'11110000' ;(RB0,RB3) Como salida, (RB4,RB7 como como entrada)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000E   0086           00061         MOVWF   TRISB
+                      00062         ;configuracion general
+000F   1683 1303      00063         BANKSEL WPUB
+0011   300F           00064         MOVLW   b'00001111' ;habilito pullups, configuro prescaler a 256, y lo asigno al TMR0
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0012   0081           00065         MOVWF   OPTION_REG
+0013   30F0           00066         MOVLW   b'11110000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0014   0095           00067         MOVWF   WPUB
+                      00068         ;configuracion de interrupciones
+0015   3088           00069         MOVLW   b'10001000'; habilito interrupciones globales, rb. AQUI HABILITAR INTERRPCIONES POR PUER
                             TO SERIE SI SE PUEDE
-                      00072         MOVWF   INTCON
-                      00073         MOVLW   b'11110000' ;interrupcion por puerto b solo a RB4,RB5,RB6,RB7
-                      00074         MOVWF   IOCB
-                      00075         ENDM
-                      00076         
-                      00077 INICIO   CONFIG_SALIDAS
-                          M         ;Configuracion del display
-0005   1683 1303          M         BANKSEL TRISD
+0016   008B           00070         MOVWF   INTCON
+0017   30F0           00071         MOVLW   b'11110000' ;interrupcion por puerto b solo a RB4,RB5,RB6,RB7
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0007   0188               M         CLRF    TRISD
-                          M         ;Configuracion puerto c. RC6 como salida por TX, y RC7 como entrada 
-0008   3080               M         MOVLW   b'10000000'
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0009   0087               M         MOVWF   TRISC
-                      00078          CONFIG_ENTRADAS
-000A   1683 1703          M         BANKSEL ANSEL
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-000C   0189               M         CLRF    ANSELH
-000D   30F0               M         MOVLW   b'11110000' ;(RB0,RB3) Como salida, (RB4,RB7 como como entrada)
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-000E   0086               M         MOVWF   TRISB
-                      00079          CONFIG_GENERAL
-000F   1683 1303          M         BANKSEL WPUB
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  3
+0018   0096           00072         MOVWF   IOCB
+                      00073         
+                      00074 ;Programa principal
+                      00075          ;inicializaciones
+0019   1283 1303      00076          BANKSEL PORTD
+001B   30F0           00077          MOVLW  b'11110000'
+001C   0086           00078          MOVWF  PORTB
+001D   0187           00079          CLRF   PORTC
+001E   0188           00080          CLRF   PORTD
+001F   01F2           00081          CLRF   PISO_ACTUAL
+0020   1472           00082          BSF    PISO_ACTUAL,0
+0021   01F3           00083          CLRF   PISO_OBJETIVO
+0022   01F4           00084          CLRF   FUNCIONANDO
+0023   01F5           00085          CLRF   SHIFTREG
+0024   01F6           00086          CLRF   TECLA_PRESIONADA
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0011   300F               M         MOVLW   b'00001111' ;habilito pullups, configuro prescaler a 256, y lo asigno al TMR0
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0012   0081               M         MOVWF   OPTION_REG
-0013   30F0               M         MOVLW   b'11110000'
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0014   0095               M         MOVWF   WPUB
-                      00080          CONFIG_INTERRUPCIONES
-0015   3088               M         MOVLW   b'10001000'; habilito interrupciones globales, rb. AQUI HABILITAR INTERRPCIONES POR PUER
-                            TO SERIE SI SE PUEDE
-0016   008B               M         MOVWF   INTCON
-0017   30F0               M         MOVLW   b'11110000' ;interrupcion por puerto b solo a RB4,RB5,RB6,RB7
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0018   0096               M         MOVWF   IOCB
-                      00081 ;Programa principal
-                      00082          ;inicializaciones
-0019   1283 1303      00083          BANKSEL PORTD
-001B   30F0           00084          MOVLW  b'11110000'
-001C   0086           00085          MOVWF  PORTB
-001D   0187           00086          CLRF   PORTC
-001E   0188           00087          CLRF   PORTD
-001F   01F2           00088          CLRF   PISO_ACTUAL
-0020   01F3           00089          CLRF   PISO_OBJETIVO
-0021   01F4           00090          CLRF   FUNCIONANDO
-0022   01F5           00091          CLRF   SETEO
-0023   01F6           00092          CLRF   SHIFTREG
-0024   01F7           00093          CLRF   TECLA_PRESIONADA
-                      00094          ;queda mostrando el display
-0025   2???           00095          CALL   MOSTRAR_DSPL
-0026   2???           00096          GOTO   $-1
-                      00097 
-0027                  00098 MOSTRAR_DSPL
-0027   0877           00099          MOVF   TECLA_PRESIONADA,W
-0028   2???           00100          CALL   TABLA_DSPL
-0029   0088           00101          MOVWF  PORTD
-002A   0008           00102          RETURN
-                      00103 
-002B                  00104 TABLA_DSPL
-002B   0782           00105          ADDWF  PCL,F
-002C   343F           00106          RETLW  0x3F
-002D   3406           00107          RETLW  0x06
-002E   345B           00108          RETLW  0x5B
-002F   344F           00109          RETLW  0x4F
-0030   3466           00110          RETLW  0x66 
-0031   346D           00111          RETLW  0x6D
-0032   347D           00112          RETLW  0x7D
-0033   3407           00113          RETLW  0x07
-0034   347F           00114          RETLW  0x7F
-0035   346F           00115          RETLW  0x6F
-0036   3477           00116          RETLW  0x77
-0037   347C           00117          RETLW  0x7C
-0038   3439           00118          RETLW  0x39
-0039   345E           00119          RETLW  0x5E
-003A   3479           00120          RETLW  0x79
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  4
+0025   01F7           00087          CLRF   PRESIONADO
+                      00088          ;queda mostrando el display
+0026                  00089 LOOP_MAIN        
+0026   1C77           00090          BTFSS  PRESIONADO,0
+0027   2???           00091          GOTO   MOSTRAR
+0028   300F           00092          MOVLW  .15
+0029   0276           00093          SUBWF  TECLA_PRESIONADA,W
+002A   1903           00094          BTFSC  STATUS,Z
+002B   2???           00095          GOTO   EMERGENCIA
+002C   1077           00096          BCF    PRESIONADO,0
+002D   3005           00097          MOVLW  .5
+002E   0276           00098          SUBWF  TECLA_PRESIONADA,W
+002F   1803           00099          BTFSC  STATUS,C
+0030   2???           00100          GOTO   VERIF2
+0031   2???           00101          GOTO   TESTEAR
+0032                  00102 VERIF2
+0032   3009           00103          MOVLW  .9
+0033   0276           00104          SUBWF  TECLA_PRESIONADA,W
+0034   1803           00105          BTFSC  STATUS,C
+0035   2???           00106          GOTO   TESTEAR
+0036   2???           00107          GOTO   RESTAR
+0037                  00108 RESTAR
+0037   3004           00109          MOVLW  .4
+0038   02F6           00110          SUBWF  TECLA_PRESIONADA,F
+0039                  00111 TESTEAR
+0039   1C74           00112          BTFSS  FUNCIONANDO,0
+003A   2???           00113          GOTO   NO_FUNCIONANDO
+003B   0876           00114          MOVF   TECLA_PRESIONADA,W
+003C   00F2           00115          MOVWF  PISO_ACTUAL
+003D   0273           00116          SUBWF  PISO_OBJETIVO,W
+003E   1D03           00117          BTFSS  STATUS,Z
+003F   2???           00118          GOTO   MOSTRAR
+0040   1007           00119          BCF    PORTC,0
+0041   1087           00120          BCF    PORTC,1
+0042   18F4           00121          BTFSC  FUNCIONANDO,1
+0043   2???           00122          GOTO   MOSTRAR
+0044   14F4           00123          BSF    FUNCIONANDO,1
+0045   303D           00124          MOVLW  .61
+0046   0081           00125          MOVWF  TMR0
+0047   300A           00126          MOVLW  .10
+0048   00FC           00127          MOVWF  CONTADOR_TIMER
+0049   110B           00128          BCF    INTCON,T0IF
+004A   168B           00129          BSF    INTCON,T0IE
+004B   2???           00130          GOTO   MOSTRAR
+004C                  00131 NO_FUNCIONANDO
+004C   0876           00132          MOVF   TECLA_PRESIONADA,W
+004D   00F3           00133          MOVWF  PISO_OBJETIVO
+004E   0272           00134          SUBWF  PISO_ACTUAL,W
+004F   1903           00135          BTFSC  STATUS,Z
+0050   2???           00136          GOTO   MOSTRAR
+0051   1474           00137          BSF    FUNCIONANDO,0
+0052   1803           00138          BTFSC  STATUS,C
+0053   2???           00139          GOTO   ARRIBA
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-003B   3471           00121          RETLW  0x71
-                      00122 
-003C                  00123 TABLA_TECLADO
-003C   0782           00124          ADDWF  PCL,F
-003D   340A           00125          RETLW  .10
-003E   3400           00126          RETLW  .0
-003F   340B           00127          RETLW  .11
-0040   340C           00128          RETLW  .12
-0041   3401           00129          RETLW  .1
-0042   3402           00130          RETLW  .2
-0043   3403           00131          RETLW  .3
-0044   340D           00132          RETLW  .13
-0045   3404           00133          RETLW  .4
-0046   3405           00134          RETLW  .5
-0047   3406           00135          RETLW  .6
-0048   340E           00136          RETLW  .14
-0049   3407           00137          RETLW  .7
-004A   3408           00138          RETLW  .8
-004B   3409           00139          RETLW  .9
-004C   340F           00140          RETLW  .15
-004D                  00141 RETARDO
-004D   30D2           00142         MOVLW   D'210'
-004E   00F8           00143         MOVWF   DELAY1
-004F   3003           00144 LOOP1   MOVLW   D'3'
-0050   00F9           00145         MOVWF   DELAY2
-0051   3001           00146 LOOP2   MOVLW   D'1'
-0052   00FA           00147         MOVWF   DELAY3
-0053   0BFA           00148 LOOP3   DECFSZ  DELAY3,F
-0054   2???           00149         GOTO    LOOP3
-0055   0BF9           00150         DECFSZ  DELAY2,F
-0056   2???           00151         GOTO    LOOP2
-0057   0BF8           00152         DECFSZ  DELAY1,F
-0058   2???           00153         GOTO    LOOP1
-0059   0008           00154         RETURN
-005A                  00155 ISR_INICIO
-                      00156         ;GUARDAR CONTEXTO
-005A   00F0           00157         MOVWF   W_TEMP
-005B   0E03           00158         SWAPF   STATUS,W
-005C   00F1           00159         MOVWF   STATUS_TEMP
-                      00160         ;INTERRUPCION
-                      00161         ;BTFSC  INTCON,T0IF
-                      00162         ;GOTO   TIMER0_ISR
-005D   1C0B           00163         BTFSS   INTCON,RBIF
-005E   2???           00164         GOTO    FIN_INTE
-                      00165         ;Interrupcion por Puerto B
-005F   01FB           00166         CLRF    CONTADOR_TECLADO
-0060   300F           00167         MOVLW   b'00001111'
-0061   00F6           00168         MOVWF   SHIFTREG
-0062   1003           00169 LOOP    BCF     STATUS,C
-0063   0DF6           00170         RLF     SHIFTREG,F
-0064   0876           00171         MOVF    SHIFTREG,W
-0065   0086           00172         MOVWF   PORTB
-0066   1E06           00173         BTFSS   PORTB,RB4
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  5
+0054   2???           00140          GOTO   ABAJO
+0055                  00141 ARRIBA
+0055   1407           00142          BSF    PORTC,0
+0056   1087           00143          BCF    PORTC,1
+0057   2???           00144          GOTO   MOSTRAR
+0058                  00145 ABAJO
+0058   1007           00146          BCF    PORTC,0
+0059   1487           00147          BSF    PORTC,1
+005A   2???           00148          GOTO   MOSTRAR
+                      00149          
+005B   2???           00150 MOSTRAR  CALL   MOSTRAR_DSPL
+005C   2???           00151          GOTO   LOOP_MAIN
+005D                  00152 EMERGENCIA
+005D   1507           00153          BSF    PORTC,2
+005E   2???           00154          GOTO   LOOP_MAIN
+005F                  00155 MOSTRAR_DSPL
+005F   0872           00156          MOVF   PISO_ACTUAL,W
+0060   2???           00157          CALL   TABLA_DSPL
+0061   0088           00158          MOVWF  PORTD
+0062   0008           00159          RETURN
+                      00160 
+0063                  00161 TABLA_DSPL
+0063   0782           00162          ADDWF  PCL,F
+0064   343F           00163          RETLW  0x3F
+0065   3406           00164          RETLW  0x06
+0066   345B           00165          RETLW  0x5B
+0067   344F           00166          RETLW  0x4F
+0068   3466           00167          RETLW  0x66 
+0069   346D           00168          RETLW  0x6D
+006A   347D           00169          RETLW  0x7D
+006B   3407           00170          RETLW  0x07
+006C   347F           00171          RETLW  0x7F
+006D   346F           00172          RETLW  0x6F
+006E   3477           00173          RETLW  0x77
+006F   347C           00174          RETLW  0x7C
+0070   3439           00175          RETLW  0x39
+0071   345E           00176          RETLW  0x5E
+0072   3479           00177          RETLW  0x79
+0073   3471           00178          RETLW  0x71
+                      00179 
+0074                  00180 TABLA_TECLADO
+0074   0782           00181          ADDWF  PCL,F
+0075   340A           00182          RETLW  .10
+0076   3400           00183          RETLW  .0
+0077   340B           00184          RETLW  .11
+0078   340C           00185          RETLW  .12
+0079   3407           00186          RETLW  .7
+007A   3408           00187          RETLW  .8
+007B   3409           00188          RETLW  .9
+007C   340D           00189          RETLW  .13
+007D   3404           00190          RETLW  .4
+007E   3405           00191          RETLW  .5
+007F   3406           00192          RETLW  .6
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0067   2???           00174         GOTO    FIN_RB
+0080   340E           00193          RETLW  .14
+0081   3401           00194          RETLW  .1
+0082   3402           00195          RETLW  .2
+0083   3403           00196          RETLW  .3
+0084   340F           00197          RETLW  .15
+0085                  00198 RETARDO
+0085   30D2           00199         MOVLW   D'210'
+0086   00F8           00200         MOVWF   DELAY1
+0087   3003           00201 LOOP1   MOVLW   D'3'
+0088   00F9           00202         MOVWF   DELAY2
+0089   3001           00203 LOOP2   MOVLW   D'1'
+008A   00FA           00204         MOVWF   DELAY3
+008B   0BFA           00205 LOOP3   DECFSZ  DELAY3,F
+008C   2???           00206         GOTO    LOOP3
+008D   0BF9           00207         DECFSZ  DELAY2,F
+008E   2???           00208         GOTO    LOOP2
+008F   0BF8           00209         DECFSZ  DELAY1,F
+0090   2???           00210         GOTO    LOOP1
+0091   0008           00211         RETURN
+0092                  00212 ISR_INICIO
+                      00213         ;GUARDAR CONTEXTO
+0092   00F0           00214         MOVWF   W_TEMP
+0093   0E03           00215         SWAPF   STATUS,W
+0094   00F1           00216         MOVWF   STATUS_TEMP
+                      00217         ;INTERRUPCION
+0095   190B           00218         BTFSC   INTCON,T0IF
+0096   2???           00219         GOTO    ISR_TIMER
+0097   1C0B           00220         BTFSS   INTCON,RBIF
+0098   2???           00221         GOTO    FIN_INTE
+                      00222         ;Interrupcion por Puerto B
+0099   01FB           00223         CLRF    CONTADOR_TECLADO
+009A   300F           00224         MOVLW   b'00001111'
+009B   00F5           00225         MOVWF   SHIFTREG
+009C   1003           00226 LOOPI   BCF     STATUS,C
+009D   0DF5           00227         RLF     SHIFTREG,F
+009E   0875           00228         MOVF    SHIFTREG,W
+009F   0086           00229         MOVWF   PORTB
+00A0   1E06           00230         BTFSS   PORTB,RB4
+00A1   2???           00231         GOTO    FIN_RB
 Message[305]: Using default destination of 1 (file).
-0068   0AFB           00175         INCF    CONTADOR_TECLADO
-0069   1E86           00176         BTFSS   PORTB,RB5
-006A   2???           00177         GOTO    FIN_RB
+00A2   0AFB           00232         INCF    CONTADOR_TECLADO
+00A3   1E86           00233         BTFSS   PORTB,RB5
+00A4   2???           00234         GOTO    FIN_RB
 Message[305]: Using default destination of 1 (file).
-006B   0AFB           00178         INCF    CONTADOR_TECLADO
-006C   1F06           00179         BTFSS   PORTB,RB6
-006D   2???           00180         GOTO    FIN_RB
+00A5   0AFB           00235         INCF    CONTADOR_TECLADO
+00A6   1F06           00236         BTFSS   PORTB,RB6
+00A7   2???           00237         GOTO    FIN_RB
 Message[305]: Using default destination of 1 (file).
-006E   0AFB           00181         INCF    CONTADOR_TECLADO
-006F   1F86           00182         BTFSS   PORTB,RB7
-0070   2???           00183         GOTO    FIN_RB
+00A8   0AFB           00238         INCF    CONTADOR_TECLADO
+00A9   1F86           00239         BTFSS   PORTB,RB7
+00AA   2???           00240         GOTO    FIN_RB
 Message[305]: Using default destination of 1 (file).
-0071   0AFB           00184         INCF    CONTADOR_TECLADO
-0072   3010           00185         MOVLW   0x10
-0073   027B           00186         SUBWF   CONTADOR_TECLADO,W
-0074   1D03           00187         BTFSS   STATUS,Z
-0075   2???           00188         GOTO    NINGUNA_TECLA
-0076   2???           00189         GOTO    LOOP
-0077   2???           00190 FIN_RB  CALL    RETARDO
-0078   087B           00191         MOVF    CONTADOR_TECLADO,W
-0079   2???           00192         CALL    TABLA_TECLADO
-007A   00F7           00193         MOVWF   TECLA_PRESIONADA
-                      00194         ;aca empezamos la logica para ver que hacemos
-007B   300F           00195         MOVLW   .15
-007C   0277           00196         SUBWF   TECLA_PRESIONADA,W
-007D   1903           00197         BTFSC   STATUS,Z
-007E   2???           00198         GOTO    RUTINA_EMERGENCIA
-007F   300A           00199         MOVLW   .10
-0080   0277           00200         SUBWF   TECLA_PRESIONADA,W
-0081   1903           00201         BTFSC   STATUS,Z
-0082   1587           00202         BSF     PORTC,3
-0083   300B           00203         MOVLW   .11
-0084   0277           00204         SUBWF   TECLA_PRESIONADA,W
-0085   1903           00205         BTFSC   STATUS,Z
-0086   1187           00206         BCF     PORTC,3
-0087   2???           00207         GOTO    NINGUNA_TECLA
-0088                  00208 RUTINA_EMERGENCIA
-0088   128B           00209         BCF     INTCON,T0IE
-0089   110B           00210         BCF     INTCON,T0IF
-008A   0181           00211         CLRF    TMR0
-008B   1007           00212         BCF     PORTC,0
-008C   1007           00213         BCF     PORTC,0
-008D   1587           00214         BSF     PORTC,3
-008E   1607           00215         BSF     PORTC,4
-008F                  00216 NINGUNA_TECLA
-008F   1283 1303      00217         BANKSEL INTCON
-0091   100B           00218         BCF     INTCON,RBIF
-0092                  00219 FIN_INTE        ;RECUPERAR CONTEXTO
-0092   0E71           00220         SWAPF   STATUS_TEMP,W
-0093   0083           00221         MOVWF   STATUS
-0094   0EF0           00222         SWAPF   W_TEMP,F
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  6
+00AB   0AFB           00241         INCF    CONTADOR_TECLADO
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0095   0E70           00223         SWAPF   W_TEMP,W
-0096   0009           00224         RETFIE
-2FF1 3FFF             00225         END
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  7
+00AC   3010           00242         MOVLW   0x10
+00AD   027B           00243         SUBWF   CONTADOR_TECLADO,W
+00AE   1D03           00244         BTFSS   STATUS,Z
+00AF   2???           00245         GOTO    LOOPI
+00B0   2???           00246         GOTO    NINGUNA_TECLA
+00B1   2???           00247 FIN_RB  CALL    RETARDO
+00B2   1477           00248         BSF     PRESIONADO,0
+00B3   087B           00249         MOVF    CONTADOR_TECLADO,W
+00B4   2???           00250         CALL    TABLA_TECLADO
+00B5   00F6           00251         MOVWF   TECLA_PRESIONADA
+00B6                  00252 NINGUNA_TECLA
+00B6   1283 1303      00253         BANKSEL INTCON
+00B8   100B           00254         BCF     INTCON,RBIF
+00B9   2???           00255         GOTO    FIN_INTE
+00BA                  00256 ISR_TIMER
+00BA   110B           00257         BCF     INTCON,T0IF
+00BB   1CF4           00258         BTFSS   FUNCIONANDO,1
+00BC   2???           00259         GOTO    FIN_INTE
+00BD   0BFC           00260         DECFSZ  CONTADOR_TIMER,F
+00BE   2???           00261         GOTO    CONTINUE
+00BF   2???           00262         GOTO    FIN_TMR0
+00C0                  00263 CONTINUE
+00C0   1507           00264         BSF     PORTC,2
+00C1   303D           00265         MOVLW   .61
+00C2   0081           00266         MOVWF   TMR0
+00C3   2???           00267         GOTO    FIN_INTE
+00C4                  00268 FIN_TMR0
+00C4   1107           00269         BCF     PORTC,2
+00C5   128B           00270         BCF     INTCON,T0IE
+00C6   1074           00271         BCF     FUNCIONANDO,0
+00C7   10F4           00272         BCF     FUNCIONANDO,1
+                      00273         
+                      00274         ;--------rutina por timer0----------------
+00C8                  00275 FIN_INTE        ;RECUPERAR CONTEXTO
+00C8   0E71           00276         SWAPF   STATUS_TEMP,W
+00C9   0083           00277         MOVWF   STATUS
+00CA   0EF0           00278         SWAPF   W_TEMP,F
+00CB   0E70           00279         SWAPF   W_TEMP,W
+00CC   0009           00280         RETFIE
+2FF1 3FFF             00281         END
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  7
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+ABAJO                             00000058
 ABDEN                             00000000
 ABDOVF                            00000007
 ACKDT                             00000005
@@ -340,6 +378,7 @@ ANS8                              00000000
 ANS9                              00000001
 ANSEL                             00000188
 ANSELH                            00000189
+ARRIBA                            00000055
 BAUDCTL                           00000187
 BCLIE                             00000003
 BCLIF                             00000003
@@ -359,14 +398,14 @@ BRG4                              00000004
 BRG5                              00000005
 BRG6                              00000006
 BRG7                              00000007
-BRG8                              00000000
-BRG9                              00000001
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  8
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  8
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+BRG8                              00000000
+BRG9                              00000001
 BRGH                              00000002
 C                                 00000000
 C1CH0                             00000000
@@ -418,24 +457,22 @@ CCPR2H                            0000001C
 CCPR2L                            0000001B
 CHS0                              00000002
 CHS1                              00000003
-CHS2                              00000004
-CHS3                              00000005
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE  9
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE  9
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+CHS2                              00000004
+CHS3                              00000005
 CKE                               00000006
 CKP                               00000004
 CM1CON0                           00000107
 CM2CON0                           00000108
 CM2CON1                           00000109
-CONFIG_ENTRADAS                   
-CONFIG_GENERAL                    
-CONFIG_INTERRUPCIONES             
-CONFIG_SALIDAS                    
 CONTADOR_TECLADO                  0000007B
+CONTADOR_TIMER                    0000007C
+CONTINUE                          000000C0
 CREN                              00000004
 CSRC                              00000007
 D                                 00000005
@@ -465,10 +502,12 @@ EEDATH                            0000010E
 EEIE                              00000004
 EEIF                              00000004
 EEPGD                             00000007
+EMERGENCIA                        0000005D
 F                                 00000001
 FERR                              00000002
-FIN_INTE                          00000092
-FIN_RB                            00000077
+FIN_INTE                          000000C8
+FIN_RB                            000000B1
+FIN_TMR0                          000000C4
 FSR                               00000004
 FUNCIONANDO                       00000074
 FVREN                             00000000
@@ -477,14 +516,14 @@ GIE                               00000007
 GO                                00000001
 GO_DONE                           00000001
 GO_NOT_DONE                       00000001
-HTS                               00000002
-I2C_DATA                          00000005
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 10
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 10
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+HTS                               00000002
+I2C_DATA                          00000005
 I2C_READ                          00000002
 I2C_START                         00000003
 I2C_STOP                          00000004
@@ -507,15 +546,18 @@ IRCF0                             00000004
 IRCF1                             00000005
 IRCF2                             00000006
 IRP                               00000007
-ISR_INICIO                        0000005A
-LOOP                              00000062
-LOOP1                             0000004F
-LOOP2                             00000051
-LOOP3                             00000053
+ISR_INICIO                        00000092
+ISR_TIMER                         000000BA
+LOOP1                             00000087
+LOOP2                             00000089
+LOOP3                             0000008B
+LOOPI                             0000009C
+LOOP_MAIN                         00000026
 LTS                               00000001
 MC1OUT                            00000007
 MC2OUT                            00000006
-MOSTRAR_DSPL                      00000027
+MOSTRAR                           0000005B
+MOSTRAR_DSPL                      0000005F
 MSK                               00000093
 MSK0                              00000000
 MSK1                              00000001
@@ -525,7 +567,7 @@ MSK4                              00000004
 MSK5                              00000005
 MSK6                              00000006
 MSK7                              00000007
-NINGUNA_TECLA                     0000008F
+NINGUNA_TECLA                     000000B6
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BO                            00000000
@@ -533,19 +575,20 @@ NOT_BOR                           00000000
 NOT_DONE                          00000001
 NOT_PD                            00000003
 NOT_POR                           00000001
-NOT_RBPU                          00000007
-NOT_RC8                           00000006
-NOT_T1SYNC                        00000002
-NOT_TO                            00000004
-NOT_TX8                           00000006
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 11
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 11
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
 NOT_W                             00000002
 NOT_WRITE                         00000002
+NO_FUNCIONANDO                    0000004C
 OERR                              00000001
 OPTION_REG                        00000081
 OSCCON                            0000008F
@@ -580,6 +623,7 @@ PORTC                             00000007
 PORTD                             00000008
 PORTE                             00000009
 PR2                               00000092
+PRESIONADO                        00000077
 PRSEN                             00000007
 PS0                               00000000
 PS1                               00000001
@@ -590,6 +634,12 @@ PSSAC1                            00000003
 PSSBD0                            00000000
 PSSBD1                            00000001
 PSTRCON                           0000009D
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 12
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 PULSR                             00000002
 PULSS                             00000003
 PWM1CON                           0000009B
@@ -597,12 +647,6 @@ R                                 00000002
 RA0                               00000000
 RA1                               00000001
 RA2                               00000002
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 12
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 RA3                               00000003
 RA4                               00000004
 RA5                               00000005
@@ -649,19 +693,19 @@ RE1                               00000001
 RE2                               00000002
 RE3                               00000003
 READ_WRITE                        00000002
-RETARDO                           0000004D
-RP0                               00000005
-RP1                               00000006
-RSEN                              00000001
-RUTINA_EMERGENCIA                 00000088
-RX9                               00000006
-RX9D                              00000000
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 13
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 13
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+RESTAR                            00000037
+RETARDO                           00000085
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
 R_NOT_W                           00000002
 R_W                               00000002
 S                                 00000003
@@ -670,9 +714,9 @@ SCKP                              00000004
 SCS                               00000000
 SEN                               00000000
 SENDB                             00000003
-SETEO                             00000075
-SHIFTREG                          00000076
+SHIFTREG                          00000075
 SMP                               00000007
+SONANDO                           00000001
 SPBRG                             00000099
 SPBRGH                            0000009A
 SPEN                              00000007
@@ -708,6 +752,12 @@ T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
 T1CKPS0                           00000004
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 T1CKPS1                           00000005
 T1CON                             00000010
 T1GINV                            00000007
@@ -715,19 +765,14 @@ T1GIV                             00000007
 T1GSS                             00000001
 T1INSYNC                          00000002
 T1OSCEN                           00000003
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 14
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 T1SYNC                            00000002
 T2CKPS0                           00000000
 T2CKPS1                           00000001
 T2CON                             00000012
-TABLA_DSPL                        0000002B
-TABLA_TECLADO                     0000003C
-TECLA_PRESIONADA                  00000077
+TABLA_DSPL                        00000063
+TABLA_TECLADO                     00000074
+TECLA_PRESIONADA                  00000076
+TESTEAR                           00000039
 TMR0                              00000001
 TMR0IE                            00000005
 TMR0IF                            00000002
@@ -766,6 +811,12 @@ TRISB5                            00000005
 TRISB6                            00000006
 TRISB7                            00000007
 TRISC                             00000087
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 TRISC0                            00000000
 TRISC1                            00000001
 TRISC2                            00000002
@@ -774,12 +825,6 @@ TRISC4                            00000004
 TRISC5                            00000005
 TRISC6                            00000006
 TRISC7                            00000007
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 15
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TRISD                             00000088
 TRISD0                            00000000
 TRISD1                            00000001
@@ -815,6 +860,7 @@ ULPWUIE                           00000002
 ULPWUIF                           00000002
 VCFG0                             00000004
 VCFG1                             00000005
+VERIF2                            00000032
 VR0                               00000000
 VR1                               00000001
 VR2                               00000002
@@ -824,6 +870,12 @@ VREN                              00000007
 VROE                              00000006
 VRR                               00000005
 VRSS                              00000004
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 W                                 00000000
 WCOL                              00000007
 WDTCON                            00000105
@@ -833,12 +885,6 @@ WDTPS2                            00000003
 WDTPS3                            00000004
 WPUB                              00000095
 WPUB0                             00000000
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 16
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 WPUB1                             00000001
 WPUB2                             00000002
 WPUB3                             00000003
@@ -852,7 +898,6 @@ WRERR                             00000003
 WUE                               00000001
 W_TEMP                            00000070
 Z                                 00000002
-_.org_2_0026                      00000026
 _BOR21V                           00003EFF
 _BOR40V                           00003FFF
 _BOR4V_BOR21V                     00003EFF
@@ -884,6 +929,12 @@ _FCMEN_ON                         00003FFF
 _FOSC_EC                          00003FFB
 _FOSC_EXTRC_CLKOUT                00003FFF
 _FOSC_EXTRC_NOCLKOUT              00003FFE
+MPASM 5.87                      ASCENSOR.ASM   6-16-2023  18:25:18         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 _FOSC_HS                          00003FFA
 _FOSC_INTRC_CLKOUT                00003FFD
 _FOSC_INTRC_NOCLKOUT              00003FFC
@@ -892,12 +943,6 @@ _FOSC_XT                          00003FF9
 _HS_OSC                           00003FFA
 _IDLOC0                           00002000
 _IDLOC1                           00002001
-MPASM 5.87                      ASCENSOR.ASM   6-14-2023  0:17:29         PAGE 17
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 _IDLOC2                           00002002
 _IDLOC3                           00002003
 _IESO_OFF                         00003BFF
@@ -927,7 +972,7 @@ __DEBUG
 __MPLAB_DEBUGGER_SIMULATOR        1
 
 Errors   :     0
-Warnings :     0 reported,     0 suppressed
+Warnings :     1 reported,     0 suppressed
 Messages :    11 reported,     0 suppressed
 
 
