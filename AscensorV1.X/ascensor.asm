@@ -27,6 +27,7 @@
 	PISO_ACTUAL	
 	PISO_OBJETIVO
 	CONTADOR_PITS	
+	RECIBIDO
 	ENDC
 	
 	CBLOCK	0x70
@@ -56,7 +57,8 @@ INICIO
 	BANKSEL	TRISD
 	CLRF	TRISD
 	;Configuracion puerto c como salida
-	CLRF	TRISC
+	MOVLW	B'10000000'
+	MOVWF	TRISC
 	;Configuracion TRANSMISION
 	BANKSEL	SPBRG
 	MOVLW	.25
@@ -64,7 +66,7 @@ INICIO
 	MOVLW	b'00100100'	;trabajo con 9600 Baudios
 	MOVWF	TXSTA
 	BANKSEL	RCSTA
-	MOVLW	b'10000000'
+	MOVLW	b'10010000'
 	MOVWF	RCSTA
 	;configuracion de entradas
 	BANKSEL	ANSEL
@@ -78,7 +80,7 @@ INICIO
 	MOVLW	b'11110000'
 	MOVWF	WPUB
 	;configuracion de interrupciones
-	MOVLW	b'10001000'; habilito interrupciones globales, rb. AQUI HABILITAR INTERRPCIONES POR PUERTO SERIE SI SE PUEDE
+	MOVLW	b'10001000'; habilito interrupciones globales, rb, perifericos. AQUI HABILITAR INTERRPCIONES POR PUERTO SERIE SI SE PUEDE
 	MOVWF	INTCON
 	MOVLW	b'11110000' ;interrupcion por puerto b solo a RB4,RB5,RB6,RB7
 	MOVWF	IOCB
@@ -101,7 +103,9 @@ INICIO
 	 MOVLW	0x31
 	 MOVWF	TXREG
 	 
-LOOP_MAIN	 
+LOOP_MAIN	
+	 BTFSC	PIR1,RCIF
+	 CALL	RECIBIR
 	 BTFSS	PRESIONADO,0		;verifica si se presiono una tecla del teclado. si no se presiono niguna, solo muestra el display.
 	 GOTO	MOSTRAR
 	 ;verifica si se presiono la tecla de emergencia (15)
@@ -189,7 +193,14 @@ MOSTRAR_DSPL
 	 CALL	TABLA_DSPL
 	 MOVWF	PORTD
 	 RETURN
-
+RECIBIR
+	 MOVF	RCREG,W
+	 MOVWF	RECIBIDO
+	 MOVLW	.64
+	 SUBWF	RECIBIDO,W
+	 MOVWF	TECLA_PRESIONADA
+	 BSF	PRESIONADO,0
+	 RETURN
 TABLA_DSPL
 	 ADDWF	PCL,F
 	 RETLW	0x3F
