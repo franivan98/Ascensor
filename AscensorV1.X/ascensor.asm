@@ -26,16 +26,16 @@
 	CBLOCK	    0x20
 	PISO_ACTUAL	
 	PISO_OBJETIVO
-	CONTADOR_PITS
+	CONTADOR_PITS	
 	ENDC
 	
 	CBLOCK	0x70
 	W_TEMP
 	STATUS_TEMP
-	FLAGS_REG   
-	SHIFTREG     
+	FLAGS_REG	;Registro de banderas para el ascensor. bit0: Funcionando; bit1: sonando; bit2: solo sensores; bit3: 
+	SHIFTREG	;registro para rotar. nos sirve para hacer el pulling del teclado
 	TECLA_PRESIONADA   
-	PRESIONADO
+	PRESIONADO	;Bandera para verificar si se presiono un boton o no.
 	DELAY1
 	DELAY2
 	DELAY3
@@ -55,13 +55,13 @@ INICIO
 	;Configuracion del display
 	BANKSEL	TRISD
 	CLRF	TRISD
-	;Configuracion puerto c. RC6 como salida por TX, y RC7 como entrada 
+	;Configuracion puerto c como salida
 	CLRF	TRISC
 	;Configuracion TRANSMISION
 	BANKSEL	SPBRG
 	MOVLW	.25
 	MOVWF	SPBRG
-	MOVLW	b'00100100'
+	MOVLW	b'00100100'	;trabajo con 9600 Baudios
 	MOVWF	TXSTA
 	BANKSEL	RCSTA
 	MOVLW	b'10000000'
@@ -91,46 +91,49 @@ INICIO
 	 CLRF	PORTC
 	 CLRF	PORTD
 	 CLRF	PISO_ACTUAL
-	 BSF	PISO_ACTUAL,0
+	 BSF	PISO_ACTUAL,0	;inicializo el piso actual en 1
 	 CLRF	PISO_OBJETIVO
 	 CLRF	FLAGS_REG
 	 CLRF	SHIFTREG
 	 CLRF	TECLA_PRESIONADA
 	 CLRF	PRESIONADO
-	 ;manda piso actual
+	 ;Transmito piso 1 al puerto serie
 	 MOVLW	0x31
 	 MOVWF	TXREG
-	 ;queda mostrando el display
+	 
 LOOP_MAIN	 
-	 BTFSS	PRESIONADO,0
+	 BTFSS	PRESIONADO,0		;verifica si se presiono una tecla del teclado. si no se presiono niguna, solo muestra el display.
 	 GOTO	MOSTRAR
+	 ;verifica si se presiono la tecla de emergencia (15)
 	 MOVLW	.15
 	 SUBWF	TECLA_PRESIONADA,W
 	 BTFSC	STATUS,Z
 	 GOTO	EMERGENCIA
 	 BCF	PRESIONADO,0
+	 ;verificamos si es una tecla de llamado, o un sensor
 	 MOVLW	.5
 	 SUBWF	TECLA_PRESIONADA,W
 	 BTFSC	STATUS,C
 	 GOTO	VERIF2
-	 BSF	FLAGS_REG,2
+	 BSF	FLAGS_REG,2	    ;habilito la bandera de que se presiono un boton, no un sensor
 	 GOTO	TESTEAR
 VERIF2
-	 BCF	FLAGS_REG,2
+	 BCF	FLAGS_REG,2	    ;deshabilito la bandera. esto significa que se presiono un sensor
 	 MOVLW	.9
 	 SUBWF	TECLA_PRESIONADA,W
-	 BTFSC	STATUS,C
+	 BTFSC	STATUS,C	    ;si no es un sensor, y un llamado, no hago nada
 	 GOTO	TESTEAR
 	 GOTO	RESTAR
 RESTAR
-	 ;enviar piso actual
+	 ;enviar piso actual antes de restar
 	 MOVLW	.44
 	 ADDWF	TECLA_PRESIONADA,W
 	 MOVWF	TXREG
+	 ;----------------------------
 	 MOVLW	.4
 	 SUBWF	TECLA_PRESIONADA,F
 TESTEAR
-	 BTFSS	FLAGS_REG,0
+	 BTFSS	FLAGS_REG,0	    ;si esta funcionando, solo actualizo el piso actual
 	 GOTO	NO_FUNCIONANDO
 	 BTFSC	FLAGS_REG,2
 	 GOTO	MOSTRAR
@@ -146,12 +149,12 @@ TESTEAR
 	 BSF	FLAGS_REG,1
 	 MOVLW	.61
 	 MOVWF	TMR0
-	 MOVLW	.20
+	 MOVLW	.10
 	 MOVWF	CONTADOR_TIMER
-	 MOVLW	.5
 	 MOVWF	CONTADOR_PITS
 	 BCF	INTCON,T0IF
 	 BSF	INTCON,T0IE
+	 BSF	PORTC,2
 	 GOTO	MOSTRAR
 NO_FUNCIONANDO
 	 MOVF	TECLA_PRESIONADA,W
@@ -289,11 +292,23 @@ ISR_TIMER
 	GOTO	FIN_INTE
 	DECFSZ	CONTADOR_TIMER,F
 	GOTO	CONTINUE
-	GOTO	FIN_TMR0
+	GOTO	SONAR
 CONTINUE
-	BSF	PORTC,2
 	MOVLW	.61
 	MOVWF	TMR0
+	GOTO	FIN_INTE
+SONAR
+	DECFSZ	CONTADOR_PITS,F
+	GOTO	SETEAR_BUZZER
+	GOTO	FIN_TMR0
+SETEAR_BUZZER
+	MOVLW	.10
+	MOVWF	CONTADOR_TIMER
+	BTFSS	PORTC,2
+	GOTO	$+3
+	BCF	PORTC,2
+	GOTO	$+2
+	BSF	PORTC,2
 	GOTO	FIN_INTE
 FIN_TMR0
 	BCF	PORTC,2
