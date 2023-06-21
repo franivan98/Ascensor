@@ -7,7 +7,7 @@ Message[302] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 75
 Message[302] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 79 : Register in operand not in bank 0.  Ensure that bank bits are correct.
 Message[302] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 81 : Register in operand not in bank 0.  Ensure that bank bits are correct.
 Message[302] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 86 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 275 : Using default destination of 1 (file).
-Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 278 : Using default destination of 1 (file).
-Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 281 : Using default destination of 1 (file).
-Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 284 : Using default destination of 1 (file).
+Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 290 : Using default destination of 1 (file).
+Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 293 : Using default destination of 1 (file).
+Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 296 : Using default destination of 1 (file).
+Message[305] C:\USERS\FRANK\MPLABXPROJECTS\ASCENSOR\ASCENSORV1.X\ASCENSOR.ASM 299 : Using default destination of 1 (file).
